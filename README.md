@@ -9,15 +9,15 @@
 
 - Les extensions utilisées dans ce projet sont :
     - Express : pour pouvoir créer l'API et le routage
->>> Mongoose (+ unique validator) : permet de manipuler les données dans la base de données MongoDB
->>> Bcrypt : pour crypter les mots de passes et données sensibles
->>> Multer : pour permettre la gestion des fichiers
->>> Jsonwebtoken : pour avoir une méthode sécurisée d'échange d'informations sensibles
->>> Jwt-Decode : pour pouvoir lire les données d'un token
->>> Nodemon Server : pour pouvoir lancer les scripts node
->>> Vue-Router : pour faire la distinction des URL des différentes "pages"
->>> Axios : pour pouvour créer des requêtes HTTP
- >>> Form-Data : pour pouvoir réaliser une requête "form" et non un classique format Json
+    - Mongoose (+ unique validator) : permet de manipuler les données dans la base de données MongoDB
+    - Bcrypt : pour crypter les mots de passes et données sensibles
+    - Multer : pour permettre la gestion des fichiers
+    - Jsonwebtoken : pour avoir une méthode sécurisée d'échange d'informations sensibles
+    - Jwt-Decode : pour pouvoir lire les données d'un token
+    - Nodemon Server : pour pouvoir lancer les scripts node
+    - Vue-Router : pour faire la distinction des URL des différentes "pages"
+    - Axios : pour pouvour créer des requêtes HTTP
+    - Form-Data : pour pouvoir réaliser une requête "form" et non un classique format Json
 
 ## Prérequis
 - Pour installer l'application
@@ -28,14 +28,14 @@
     - Se rendre sur "Front-end/VueApp"
     - Lancer "npm run dev"
     > L'application doit se lancer sur le port indiqué dans la console (http://localhost:8080)
-    > *** Notes ***
-    - Un utilisateur Administrateur a été créé pour Groupomania
+    - *** Notes ***
+    > Un utilisateur Administrateur a été créé pour Groupomania
     > Ses identifiants sont disponibles dans le fichier texte à part
 
 - Pour lancer le Back-end
     - Se rendre sur "Back-end"
     - Lancer "nodemon server"
     >*** Notes ***
-    - Pour gérer la base de données, se rendre sur la base de données MongoDB :
-    - Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
-    - Les identifiants sont disponibles dans le fichier texte à part
+    > Pour gérer la base de données, se rendre sur la base de données MongoDB :
+    > Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
+    > Les identifiants sont disponibles dans le fichier texte à part
