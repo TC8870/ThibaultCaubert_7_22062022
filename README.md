@@ -35,7 +35,7 @@
 - Pour lancer le Back-end
     - Se rendre sur "Back-end"
     - Lancer "nodemon server"
-    >*** Notes ***
-    > Pour gérer la base de données, se rendre sur la base de données MongoDB :
-    > Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
-    > Les identifiants sont disponibles dans le fichier texte à part
+    - *** Notes ***
+        - Pour gérer la base de données, se rendre sur la base de données MongoDB :
+        - Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
+        - Les identifiants sont disponibles dans le fichier texte à part
