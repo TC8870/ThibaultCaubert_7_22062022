@@ -8,7 +8,7 @@
 - La session utilisateur est programmée pour durer 12h maximum (durée d'une journée de travail) afin de sécuriser l'accès à la session
 
 - Les extensions utilisées dans ce projet sont :
->>> Express : pour pouvoir créer l'API et le routage
+    - Express : pour pouvoir créer l'API et le routage
 >>> Mongoose (+ unique validator) : permet de manipuler les données dans la base de données MongoDB
 >>> Bcrypt : pour crypter les mots de passes et données sensibles
 >>> Multer : pour permettre la gestion des fichiers
@@ -25,17 +25,17 @@
     > Installer Vue.js
 ## Mode d'emploi
 - Pour lancer l'application (version developpeur): 
-    > Se rendre sur "Front-end/VueApp"
-    > Lancer "npm run dev"
+    - Se rendre sur "Front-end/VueApp"
+    - Lancer "npm run dev"
     > L'application doit se lancer sur le port indiqué dans la console (http://localhost:8080)
-    *** Notes ***
+    > *** Notes ***
     - Un utilisateur Administrateur a été créé pour Groupomania
     > Ses identifiants sont disponibles dans le fichier texte à part
 
 - Pour lancer le Back-end
-    > Se rendre sur "Back-end"
-    > Lancer "nodemon server"
-    *** Notes ***
-    Pour gérer la base de données, se rendre sur la base de données MongoDB :
-    > Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
-    > Les identifiants sont disponibles dans le fichier texte à part
+    - Se rendre sur "Back-end"
+    - Lancer "nodemon server"
+    >*** Notes ***
+    - Pour gérer la base de données, se rendre sur la base de données MongoDB :
+    - Lien : https://cloud.mongodb.com/v2/62beb8b72e6b8b0049e896f0#clusters
+    - Les identifiants sont disponibles dans le fichier texte à part
