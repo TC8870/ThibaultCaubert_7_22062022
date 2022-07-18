@@ -84,7 +84,8 @@ export default {
     axios
       .get(('http://localhost:3000/api/posts'), {headers: { Authorization: 'Bearer ' + tokenWithDatas.token }})
       .then((response) => {
-        this.post = response.data
+        // Affichage en ordre inverse (Tri par ordre décroissant de date)
+        this.post = response.data.reverse()
       })
   },
   methods: {

@@ -89,7 +89,6 @@ export default {
               'Content-type': 'multipart/form-data'}
           })
           .then((response) => {
-            window.alert('Votre post a été publié')
             this.$router.push('/Posts')
           })
           .catch((error) => {

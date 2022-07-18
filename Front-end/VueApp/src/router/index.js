@@ -8,6 +8,7 @@ import Signup from '@/components/Signup'
 import SignupOK from '@/components/SignupOK'
 import Login from '@/components/Login'
 import ModifyAccount from '@/components/ModifyAccount'
+import DeleteAccount from '@/components/DeleteAccount'
 import CreatePost from '@/components/CreatePost'
 import ModifyPost from '@/components/ModifyPost'
 import ShowPosts from '@/components/ShowPosts'
@@ -48,6 +49,11 @@ export default new Router({
       path: '/ModifyAccount',
       name: 'ModifyAccount',
       component: ModifyAccount
+    },
+    {
+      path: '/DeleteAccount',
+      name: 'DeleteAccount',
+      component: DeleteAccount
     },
     {
       path: '/Posts',

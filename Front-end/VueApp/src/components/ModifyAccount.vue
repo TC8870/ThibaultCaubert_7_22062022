@@ -29,7 +29,8 @@
               placeholder="Renseigner mon mot de passe pour valider les modifications">
           </p>
         </div>
-        <button @click.prevent="modifyAccount()" type="submit">Modifier mon compte</button>
+        <button @click.prevent="modifyAccount()" type="submit" class = "btnModifyDeleteAccount">Modifier mon compte</button>
+        <button @click.prevent="deleteAccount()" type="submit" class = "btnModifyDeleteAccount">Supprimer mon compte</button>
         <div v-show="errorMsg" class="error">{{ errorMsg }}</div>
       </div>
     </div>
@@ -37,7 +38,7 @@
 </template>
 
 <script>
-// Désactiver le problèmdu camel case avec jwt-decode
+// Désactiver le problème du camel case avec jwt-decode
 // eslint-disable-next-line camelcase
 import jwt_decode from 'jwt-decode'
 import axios from 'axios'
@@ -69,41 +70,62 @@ export default {
   },
   methods: {
     modifyAccount () {
-      // Récupérer les données du localStorage
-      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-      const decryptedToken = jwt_decode(tokenWithDatas.token)
-      // Gestion des Regex
-      const regexEmail = /^[a-z0-9!#$ %& '*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&' * +/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/g
-      const usernameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/
-      const userlastnameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/
-      // Test si champs vides + si regex OK
-      if ((this.email !== null || this.name !== null || this.lastname !== null || this.departement === '') &&
-        (regexEmail.test(this.user.email) && usernameRegex.test(this.user.name) && userlastnameRegex.test(this.user.lastname))) {
-        this.errorMsg = ''
-        // Envoyer la requête PUT
+      // // Récupérer les données du localStorage
+      // const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+      // const decryptedToken = jwt_decode(tokenWithDatas.token)
+      // // Gestion des Regex
+      // const regexEmail = /^[a-z0-9!#$ %& '*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&' * +/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/g
+      // const usernameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/
+      // const userlastnameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/
+      // // Test si champs vides + si regex OK
+      // if ((this.email !== null || this.name !== null || this.lastname !== null || this.departement === '') &&
+      //   (regexEmail.test(this.user.email) && usernameRegex.test(this.user.name) && userlastnameRegex.test(this.user.lastname))) {
+      //   this.errorMsg = ''
+      //   // Envoyer la requête PUT
+      //   axios
+      //     .put('http://localhost:3000/api/users/' + decryptedToken.userId, {
+      //       email: this.user.email,
+      //       password: this.password,
+      //       name: this.user.name,
+      //       lastname: this.user.lastname,
+      //       departement: this.user.departement,
+      //       isAdministrator: false
+      //     }, {
+      //       headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
+      //     }
+      //     )
+      //     .then((response) => {
+      //     // Alerte de confirmation + logout pour avoir un nouveau token
+      //       window.alert('Compte modifié')
+      //       localStorage.clear('userGroupomania')
+      //       this.$router.push('/Login')
+      //     })
+      //     .catch((error) => {
+      //       console.log(error.response.data)
+      //     })
+      // } else {
+      //   this.errorMsg = 'Merci de renseigner tous les champs (email valide, un nom et prénom sans chiffres ni espaces)'
+      // }
+    },
+    deleteAccount () {
+      // Demander confirmation
+      if (window.confirm('Etes-vous sûr de vouloir supprimer votre compte ?')) {
+        // Récupérer les données du localStorage
+        const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+        const decryptedToken = jwt_decode(tokenWithDatas.token)
+        // Envoyer la requête DELETE
         axios
-          .put('http://localhost:3000/api/users/' + decryptedToken.userId, {
-            email: this.user.email,
-            password: this.password,
-            name: this.user.name,
-            lastname: this.user.lastname,
-            departement: this.user.departement,
-            isAdministrator: false
-          }, {
+          .delete('http://localhost:3000/api/users/' + decryptedToken.userId, {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           }
           )
           .then((response) => {
-          // Alerte de confirmation + logout pour avoir un nouveau token
-            window.alert('Compte modifié')
-            localStorage.clear('user')
-            this.$router.push('/Login')
+            localStorage.clear('userGroupomania')
+            this.$router.push('/DeleteAccount')
           })
           .catch((error) => {
             console.log(error.response.data)
           })
-      } else {
-        this.errorMsg = 'Merci de renseigner tous les champs (email valide, un nom et prénom sans chiffres ni espaces)'
       }
     }
   }
@@ -115,6 +137,9 @@ export default {
 .logoGroupomania {
   margin-top: auto;
   margin-bottom: auto;
+}
+.btnModifyDeleteAccount {
+  margin-top : 10px
 }
 
 @media (max-width: 1020px) {

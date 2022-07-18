@@ -74,7 +74,6 @@ export default {
             }
           })
           .then((response) => {
-            console.log(response)
             this.$router.push('/Login')
           })
           .catch((error) => {

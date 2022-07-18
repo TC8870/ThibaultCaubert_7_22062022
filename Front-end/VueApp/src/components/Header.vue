@@ -16,13 +16,13 @@
         <li>
           <router-link to="/">Accueil</router-link>
         </li>
-        <li>
+        <li v-if="userId !== ''">
           <router-link to="/ModifyAccount">Mon compte</router-link>
         </li>
-        <li>
+        <li v-if="userId !== ''">
           <router-link to="/Posts">Actualités</router-link>
         </li>
-        <li>
+        <li v-if="userId !== ''" >
           <router-link to="/CreatePost">Ajouter un post</router-link>
         </li>
       </ul>
@@ -31,12 +31,23 @@
 </template>
 
 <script>
+// Désactiver le problème du camel case avec jwt-decode
+// eslint-disable-next-line camelcase
+import jwt_decode from 'jwt-decode'
+
 export default {
   components: {
   },
   data: function () {
     return {
+      userId: ''
     }
+  },
+  mounted () {
+    // Récupérer les données du localStorage
+    const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+    const decryptedToken = jwt_decode(tokenWithDatas.token)
+    this.userId = decryptedToken.userId
   },
   methods: {
     userLogOut () {
