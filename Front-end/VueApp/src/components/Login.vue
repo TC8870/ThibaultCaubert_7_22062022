@@ -52,6 +52,8 @@ export default {
             // On ajoute les infos de l'User au LocalStorage
             localStorage.setItem('userGroupomania', JSON.stringify(infoConnexionUser))
             this.$router.push('/Posts')
+            // On rafraichit pour permettre d'actualiser la visibilité des menus
+            location.reload()
           })
           .catch(() => {
             this.loading = false

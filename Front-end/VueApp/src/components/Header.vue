@@ -53,6 +53,8 @@ export default {
     userLogOut () {
       localStorage.removeItem('userGroupomania')
       this.$router.push('/Login')
+      // On rafraichit pour permettre d'actualiser la visibilité des menus
+      location.reload()
     }
   }
 }

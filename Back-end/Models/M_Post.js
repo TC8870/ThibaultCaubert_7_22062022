@@ -15,6 +15,8 @@ const postSchema = mongoose.Schema ({
     usersLiked : [String],
     usersDisliked : [String],
     //Commentaires - inclus directement dans le post
+    commentUniqueId : [String],
+    commentUserId : [String],
     commentUserNames : [String],
     commentDates : [String],
     commentDescriptions : [String]

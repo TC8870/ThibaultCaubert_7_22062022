@@ -1,7 +1,7 @@
 <template>
   <form class="form" method="put">
     <div id="containerModifyPost" class="containerModel1">
-      <img src="../assets/icon-left-font.png" alt="logo de Groupomania" class="logoGroupomania logoGroupomaniaCenter" />
+      <img class="publicationImageModify" v-bind:src=post.imageUrl>
       <div class="containerModel2">
         <h2 class="textmodel1">Modifier mon post</h2>
         <div class="formulaireType">
@@ -42,6 +42,8 @@ export default {
       dislikes: '',
       usersLiked: [],
       usersDisliked: [],
+      commentUniqueId: [],
+      commentUserId: [],
       commentUserNames: [],
       commentDates: [],
       commentDescriptions: [],
@@ -52,16 +54,14 @@ export default {
   mounted () {
     // Récupérer les données du localStorage
     const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-    const decryptedToken = jwt_decode(tokenWithDatas.token)
     const post = JSON.parse(localStorage.getItem('postToModify'))
     const postId = post.postId
-    const headerConfig = { headers: { Authorization: 'Bearer ' + decryptedToken } }
+    const headerConfig = { headers: { Authorization: 'Bearer ' + tokenWithDatas.token } }
     // Afficher les champs
     axios
       .get('http://localhost:3000/api/posts/' + postId, headerConfig)
       .then((response) => {
         this.post = response.data
-        console.log(response.data)
       })
   },
   methods: {
@@ -71,38 +71,43 @@ export default {
     },
     modifyPost () {
     // Récupérer les données du localStorage
-      const user = JSON.parse(localStorage.getItem('userGroupomania'))
+      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+      const decryptedToken = jwt_decode(tokenWithDatas.token)
       const post = JSON.parse(localStorage.getItem('postToModify'))
-      const AccessToken = user.token
       const postId = post.postId
-      // Test si champs vides -- à compléter
-      if (this.titre !== null || this.description !== null) {
+      // Gestion de la Formdata
+      const myFormModify = new FormData()
+      // Partie Post
+      const myDataToModifyPost = {
+        'userId': decryptedToken.userId,
+        'date': new Date().toLocaleDateString('fr'),
+        'userName': decryptedToken.userCompleteName,
+        'title': this.post.title,
+        'description': this.post.description,
+        'likes': post.likes,
+        'dislikes': post.dislikes,
+        'usersLike': post.usersLiked,
+        'usersDislike': post.usersDisliked,
+        'commentUniqueId': post.commentUniqueId,
+        'commentUser': post.commentUser,
+        'commentUserNames': post.commentUserNames,
+        'commentDates': [],
+        'commentDescriptions': []
+      }
+      myFormModify.append('post', JSON.stringify(myDataToModifyPost))
+      // Partie Image - Test si nouvelle image ou non
+      const file = this.file
+      myFormModify.append('image', file)
+      if (this.title !== null || this.description !== null) {
         // Envoyer la requête PUT - form data too !
         axios
-          .put('http://localhost:3000/api/posts/' + postId, {
-            userId: post.userId,
-            date: new Date().toLocaleDateString('fr'),
-            userName: post.name,
-            title: this.title,
-            description: this.description,
-            imageUrl: this.newImage,
-            likes: post.likes,
-            dislikes: post.dislikes,
-            usersLiked: post.usersLiked,
-            usersDisliked: post.usersDisliked,
-            // Commentaires
-            commentUserNames: post.commentUserNames,
-            commentDates: post.commentDates,
-            commentDescriptions: post.commentDescriptions
-          }, {
+          .put('http://localhost:3000/api/posts/' + postId, myFormModify, {
             headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + AccessToken
+              'Content-type': 'multipart/form-data',
+              Authorization: 'Bearer ' + tokenWithDatas.token
             }
           })
           .then((response) => {
-            console.log(post)
-            console.log(this.title)
             window.alert('Post modifié')
             this.$router.push('/Posts')
           })
@@ -110,7 +115,8 @@ export default {
             console.log(error.response.data)
           })
       } else {
-        this.errorMsg = 'Merci de renseigner tous les champs (email valide, mot de passe avec au minimum une majuscule et un caractère spécial, un nom et prénom sans chiffre)'
+        // Indiquer de compléter un titre et une description
+        this.errorMsg = 'Merci de renseigner un titre et une description'
       }
     }
   }
@@ -123,6 +129,20 @@ export default {
   display: flex;
   flex-direction: row;
   }
+.publicationImageModify {
+  background-color: red;
+  border-radius: 20px;
+  max-height: 250px;
+  max-width: 250px;
+  margin-top:15px;
+  margin-bottom: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
+  display:block;
+  border-radius: 10%;
+  box-shadow: -3px 3px 3px #4E5166;
+  max-height : 250px
+}
 
 @media (max-width: 1020px) {
   .zoneImageBtn{

@@ -77,7 +77,9 @@ export default {
             this.$router.push('/Login')
           })
           .catch((error) => {
+            // Si erreur alors email déjà utilisé
             console.log(error.response.data)
+            this.errorMsg = 'Email déjà utilisé'
           })
       } else {
         this.errorMsg = 'Merci de renseigner tous les champs (email valide, mot de passe avec au minimum une majuscule et un caractère spécial, un nom et prénom sans chiffre)'

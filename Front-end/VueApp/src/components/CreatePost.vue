@@ -54,34 +54,37 @@ export default {
       this.newImage = URL.createObjectURL(this.file)
     },
     createPost () {
-    // Récupérer les données du localStorage
-      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-      const decryptedToken = jwt_decode(tokenWithDatas.token)
-      // Gestion de la Formdata
-      const myForm = new FormData()
-      // Partie Post
-      const myDataToCreatePost = {
-        'userId': decryptedToken.userId,
-        'date': new Date().toLocaleDateString('fr'),
-        'userName': decryptedToken.userCompleteName,
-        'title': this.title,
-        'description': this.description,
-        'likes': 0,
-        'dislikes': 0,
-        'usersLike': [],
-        'usersDislike': [],
-        'commentUserNames': [],
-        'commentDates': [],
-        'commentDescriptions': []
-      }
-      myForm.append('post', JSON.stringify(myDataToCreatePost))
-      // Partie Image
-      const file = this.file
-      myForm.append('image', file)
       // Test si champs vides
-      if (this.title !== '' || this.description !== '' || this.newImage !== '') {
+      if (this.title !== '' && this.description !== '') {
+        console.log('ok pour sutie')
         this.errorMsg = ''
         // Si champs tous remplis
+        // Récupérer les données du localStorage
+        const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+        const decryptedToken = jwt_decode(tokenWithDatas.token)
+        // Gestion de la Formdata
+        const myForm = new FormData()
+        // Partie Post
+        const myDataToCreatePost = {
+          'userId': decryptedToken.userId,
+          'date': new Date().toLocaleDateString('fr'),
+          'userName': decryptedToken.userCompleteName,
+          'title': this.title,
+          'description': this.description,
+          'likes': 0,
+          'dislikes': 0,
+          'usersLike': [],
+          'usersDislike': [],
+          'commentUniqueId': [],
+          'commentUserId': [],
+          'commentUserNames': [],
+          'commentDates': [],
+          'commentDescriptions': []
+        }
+        myForm.append('post', JSON.stringify(myDataToCreatePost))
+        // Partie Image
+        const file = this.file
+        myForm.append('image', file)
         axios
           .post('http://localhost:3000/api/posts', myForm, {
             headers: {
@@ -96,7 +99,7 @@ export default {
           })
           // Si des champs sont vides
       } else {
-        this.errorMsg = 'Merci de renseigner un titre et une description'
+        this.errorMsg = "Merci de renseigner un titre, une description et d'ajouter une image"
       }
     }
   }

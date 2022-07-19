@@ -27,6 +27,11 @@
   padding: 10px;
 }
 
+.messageAccueil {
+  display: flex;
+  vertical-align:middle;
+}
+
 #btnchoice {
   display: flex;
   flex-direction: column;

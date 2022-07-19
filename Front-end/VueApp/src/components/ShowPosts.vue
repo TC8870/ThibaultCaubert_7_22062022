@@ -13,7 +13,7 @@
             <p class="publicationDate">Posté le {{ post.date }}</p>
             <div class="groupeIcones">
               <p class="publicationLike styleAsset">
-                <a v-on:click="likePost(post)"><img src="../assets/thumbs-up-regular.svg" alt="logo like" class="fontIconAsset" /></a>
+                <a :key="componentKey" v-on:click="likePost(post)"><img src="../assets/thumbs-up-regular.svg" alt="logo like" class="fontIconAsset" /></a>
                 {{ post.likes }}
               </p>
               <p class="publicationDislike styleAsset">
@@ -41,12 +41,12 @@
               placeholder="Saisir mon commentaire ici">
           </div>
           <button @click.prevent="addComment(post)" type="submit" class="btnComment">Ajouter un commentaire</button>
-          <div :key="index" v-for="(commentUserNames, index) in post.commentUserNames"
+          <div :key="index" v-for="(commentUniqueId, index) in post.commentUniqueId"
             class="publicationBlocCommentaire">
             <div class="publicationBlocCommentaireHeader">
               <p class="publicationCommentaireAuteur">De : {{ post.commentUserNames[index] }}</p>
               <p class="publicationCommentaireDate">Posté le : {{ post.commentDates[index] }}</p>
-              <a v-if="userId == post.userId || isAdmin" v-on:click="deleteComment(post, [index])">
+              <a v-if="userId == post.commentUserId[index] || isAdmin" v-on:click="deleteComment(post, [index])">
               <img src="../assets/window-close-solid.svg" alt="logo supprimer" class="fontIconAsset iconDeleteComment" /></a>
             </div>
             <div class="publicationBlocCommentaireDescription">
@@ -72,7 +72,8 @@ export default {
       post: '',
       newComment: '',
       userId: '',
-      isAdmin: ''
+      isAdmin: '',
+      componentKey: 0
     }
   },
   mounted () {
@@ -89,6 +90,9 @@ export default {
       })
   },
   methods: {
+    forceRerender () {
+      this.componentKey += 1
+    },
     editPost (post) {
     // passer l'id du post en localStorage
       const IdPostToModify = {'postId': post._id}
@@ -96,24 +100,27 @@ export default {
       this.$router.push('/Posts/ModifyPost')
     },
     deletePost (post) {
-    // Récupérer les données du localStorage
-      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-      const decryptedToken = jwt_decode(tokenWithDatas.token)
-      const userId = decryptedToken.userId
-      const isAdmin = decryptedToken.admin
-      // Tester si autorisé
-      if (userId === post.userId || isAdmin) {
-        axios
-          .delete('http://localhost:3000/api/posts/' + post._id, { headers: { Authorization: 'Bearer ' + tokenWithDatas.token } })
-          .then((response) => {
-            window.alert('Post supprimé')
-            window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error.response.data)
-          })
-      } else {
-        window.alert("Vous n'êtes pas autorisé")
+    // Demander confirmation
+      if (window.confirm('Confirmer la suppression du post ?')) {
+        // Récupérer les données du localStorage
+        const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+        const decryptedToken = jwt_decode(tokenWithDatas.token)
+        const userId = decryptedToken.userId
+        const isAdmin = decryptedToken.admin
+        // Tester si autorisé
+        if (userId === post.userId || isAdmin) {
+          axios
+            .delete('http://localhost:3000/api/posts/' + post._id, { headers: { Authorization: 'Bearer ' + tokenWithDatas.token } })
+            .then((response) => {
+              window.alert('Post supprimé')
+              window.location.reload()
+            })
+            .catch((error) => {
+              console.log(error.response.data)
+            })
+        } else {
+          window.alert("Vous n'êtes pas autorisé")
+        }
       }
     },
     likePost (post) {
@@ -130,7 +137,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.location.reload()
+
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -145,7 +152,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.location.reload()
+
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -166,7 +173,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.location.reload()
+            // window.location.reload()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -181,7 +188,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.location.reload()
+            // window.location.reload()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -198,6 +205,8 @@ export default {
       } else {
         axios
           .post('http://localhost:3000/api/posts/' + post._id + '/comment', {
+            commentUniqueId: Date.now() + '-' + Math.floor(Math.random() * 1000000),
+            commentUserId: decryptedToken.userId,
             commentUserNames: decryptedToken.userCompleteName,
             commentDates: new Date().toLocaleDateString('fr'),
             commentDescriptions: this.newComment
@@ -213,25 +222,34 @@ export default {
       }
     },
     deleteComment (post, [index]) {
-      // Récupérer les données du localStorage
-      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-      console.log(post.userCompleteName[index])
-      console.log(post[index])
-      axios
-        .post('http://localhost:3000/api/posts/' + post._id + '/comment/delete', {
-          commentUserNames: post.commentUserNames[index],
-          commentDates: post.commentDates[index],
-          commentDescriptions: post.commentDescriptions[index]
-        }, {
-          headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
-        })
-        .then((response) => {
-          window.alert('Votre commentaire a été supprimé')
-          window.location.reload()
-        })
-        .catch((error) => {
-          console.log(error.response.data)
-        })
+      // Demander confirmation
+      if (window.confirm('Supprimer mon commentaire ?')) {
+        // Récupérer les données du localStorage
+        const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+        console.log('index : ' + [index])
+        console.log(post.commentUniqueId[index])
+        console.log(post.commentUserId[index])
+        console.log(post.commentUserNames[index])
+        console.log(post.commentDescriptions[index])
+        axios
+          .post('http://localhost:3000/api/posts/' + post._id + '/comment/delete', {
+            commentUniqueId: post.commentUniqueId[index],
+            commentUserId: post.commentUserId[index],
+            commentUserNames: post.commentUserNames[index],
+            commentDates: post.commentDates[index],
+            commentDescriptions: post.commentDescriptions[index]
+            // index: [index]
+          }, {
+            headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
+          })
+          .then((response) => {
+            window.alert('Votre commentaire a été supprimé')
+            // window.location.reload()
+          })
+          .catch((error) => {
+            console.log(error.response.data)
+          })
+      }
     }
   }
 }
@@ -308,7 +326,7 @@ p.publicationDelete{
   margin-right:5px;
   margin-bottom: 5px;
   margin-left:5px;
-  border: 3px solid #4E5166;
+  box-shadow: -3px 3px 3px #4E5166;
   border-radius: 10px;
   max-height: 250px;
   max-width: 250px;

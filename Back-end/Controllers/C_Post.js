@@ -4,6 +4,8 @@
 const Post = require("../Models/M_Post");
 const fs = require("fs");
 const jwt_decode = require("jwt-decode");
+const { openStdin } = require("process");
+const { db } = require("../Models/M_Post");
 
 // PARTIE POSTS *****************************************************************************************************************
 // Afficher tous les posts ******************************************************************************************************
@@ -41,18 +43,25 @@ exports.createPost = (req, res, next) => {
   // Décryptage du token
   const decryptedToken = jwt_decode(req.headers.authorization.split(" ")[1]);
   delete myNewPost._id;
+  // Si présence Image
+  if (req.file) {
+    var myImageURL = `${req.protocol}://${req.get("host")}/Images/${req.file.filename}`
+  } else {
+    var myImageURL = ''}
   // Création du post - suppression des "" dans le cas de la date, du titre et de la description
-  const post = new Post({
+  post = new Post({
     userId: decryptedToken.userId,
     date: myDate.replace(/"/g, ""),
-    userName: decryptedToken.name,
+    userName: decryptedToken.userCompleteName,
     title: myTitle.replace(/"/g, ""),
     description: myDescription.replace(/"/g, ""),
-    imageUrl: `${req.protocol}://${req.get("host")}/Images/${req.file.filename}`,
+    imageUrl: myImageURL,
     likes: 0,
     dislikes: 0,
     usersLiked: [],
     usersDisliked: [],
+    commentUniqueId: [],
+    commentUserId: [],
     commentUserNames: [],
     commentDates: [],
     commentDescriptions: [],
@@ -65,36 +74,43 @@ exports.createPost = (req, res, next) => {
 
 //Modifier un post *************************************************************************************************************
 exports.editPost = (req, res, next) => {
-  const myPostToModify = req.file
-    ? {
-        //Si Image
-        ...JSON.parse(req.body.post),
-        imageUrl: `${req.protocol}://${req.get("host")}/Images/${
-          req.file.filename
-        }`,
-      }
-    : {
-        //Si aucune Image
-        ...req.body,
-      };
-  //Trouver le post
+  // Trouver la date
+  const fullDate = req.body.post.split(",")[1];
+  const myDate = fullDate.split(":")[1];
+  // Trouver le titre
+  const fullTitle = req.body.post.split(",")[3];
+  const myTitle = fullTitle.split(":")[1];
+  // Trouver la description
+  const fullDescription = req.body.post.split(",")[4];
+  const myDescription = fullDescription.split(":")[1];
+  // Si présence Image
+  if (req.file) {
+    var myImageURL = `${req.protocol}://${req.get("host")}/Images/${req.file.filename}`
+  }
+  // Lancer la modification du post
   Post.findOne({ _id: req.params.id }).then((post) => {
     //Si Id ne correspond pas
     if (post.userId !== req.auth.userId) {
       res.status(403).json({ message: "Utilisateur non valide" });
     }
-    //Sinon
+    //Si Id correspond
     else {
       Post.updateOne(
         { _id: req.params.id },
-        {
-          ...myPostToModify,
-          _id: req.params.id,
+        {_id: req.params.id,
+          userId : req.body.post.userId,
+          date : myDate.replace(/"/g, ""),
+          userName : req.body.post.userName,
+          title : myTitle.replace(/"/g, ""),
+          description : myDescription.replace(/"/g, ""),
+          imageUrl: myImageURL,
           likes: post.likes,
           dislikes: post.dislikes,
           usersLiked: post.usersLiked,
           usersDisliked: post.usersDislike,
-          commentUSerNames: post.comments,
+          commentUniqueId : post.commentUniqueId,
+          commentUSerId: post.commentUSerId,
+          commentUSerNames: post.commentUSerNames,
           commentDates: post.commentDates,
           commentDescriptions: post.commentDescriptions,
         }
@@ -215,6 +231,8 @@ exports.createComment = (req, res, next) => {
     { _id: req.params.id },
     {
       $push: {
+        commentUniqueId : req.body.commentUniqueId,
+        commentUserId : req.body.commentUserId,
         commentUserNames: req.body.commentUserNames,
         commentDates: req.body.commentDates,
         commentDescriptions: req.body.commentDescriptions,
@@ -229,18 +247,30 @@ exports.createComment = (req, res, next) => {
 
 //Supprimer un commentaire ***********************************************************************************************************
 exports.deleteComment = (req, res, next) => {
+  // Numéro d'index
+  const myIndexToDelete = req.body.index
+  const MyArray = 
+  console.log(myIndexToDelete)
+
+  console.log(req.body),
+  console.log(req.params)
+
+  // En cours d'ajustement
   Post.updateOne(
     { _id: req.params.id },
     {
-      $pull: {
+      $update: {
+        commentUniqueId : '1',
+        commentUserId : req.body.commentUserId,
         commentUserNames: req.body.commentUserNames,
         commentDates: req.body.commentDates,
         commentDescriptions: req.body.commentDescriptions,
       },
     }
-  )
+    )
     .then(() =>
+    console.log(commentUniqueId[req.body]),
       res.status(200).json({ message: "Votre commentaire a été supprimé" })
     )
     .catch((error) => res.status(400).json({ error }));
-};
+}
