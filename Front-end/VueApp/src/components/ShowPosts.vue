@@ -13,7 +13,7 @@
             <p class="publicationDate">Posté le {{ post.date }}</p>
             <div class="groupeIcones">
               <p class="publicationLike styleAsset">
-                <a :key="componentKey" v-on:click="likePost(post)"><img src="../assets/thumbs-up-regular.svg" alt="logo like" class="fontIconAsset" /></a>
+                <a v-on:click="likePost(post)"><img src="../assets/thumbs-up-regular.svg" alt="logo like" class="fontIconAsset" /></a>
                 {{ post.likes }}
               </p>
               <p class="publicationDislike styleAsset">
@@ -72,26 +72,26 @@ export default {
       post: '',
       newComment: '',
       userId: '',
-      isAdmin: '',
-      componentKey: 0
+      isAdmin: ''
     }
   },
   mounted () {
-    // Récupérer les données du localStorage
-    const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-    const decryptedToken = jwt_decode(tokenWithDatas.token)
-    this.userId = decryptedToken.userId
-    this.isAdmin = decryptedToken.admin
-    axios
-      .get(('http://localhost:3000/api/posts'), {headers: { Authorization: 'Bearer ' + tokenWithDatas.token }})
-      .then((response) => {
-        // Affichage en ordre inverse (Tri par ordre décroissant de date)
-        this.post = response.data.reverse()
-      })
+    // Permet de recharges les posts à la modification
+    this.getAllPosts()
   },
   methods: {
-    forceRerender () {
-      this.componentKey += 1
+    getAllPosts () {
+      // Récupérer les données du localStorage
+      const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
+      const decryptedToken = jwt_decode(tokenWithDatas.token)
+      this.userId = decryptedToken.userId
+      this.isAdmin = decryptedToken.admin
+      axios
+        .get(('http://localhost:3000/api/posts'), { headers: { Authorization: 'Bearer ' + tokenWithDatas.token } })
+        .then((response) => {
+          // Affichage en ordre inverse (Tri par ordre décroissant de date)
+          this.post = response.data.reverse()
+        })
     },
     editPost (post) {
     // passer l'id du post en localStorage
@@ -137,7 +137,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -152,7 +152,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -173,13 +173,12 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            // window.location.reload()
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)
           })
       } else {
-        // Sinon envoi du -1 en tant que dislike
         axios
           .post('http://localhost:3000/api/posts/' + post._id + '/like', {
             userId: decryptedToken.userId,
@@ -188,7 +187,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            // window.location.reload()
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -214,7 +213,7 @@ export default {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.location.reload()
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)
@@ -226,25 +225,14 @@ export default {
       if (window.confirm('Supprimer mon commentaire ?')) {
         // Récupérer les données du localStorage
         const tokenWithDatas = JSON.parse(localStorage.getItem('userGroupomania'))
-        console.log('index : ' + [index])
-        console.log(post.commentUniqueId[index])
-        console.log(post.commentUserId[index])
-        console.log(post.commentUserNames[index])
-        console.log(post.commentDescriptions[index])
         axios
           .post('http://localhost:3000/api/posts/' + post._id + '/comment/delete', {
-            commentUniqueId: post.commentUniqueId[index],
-            commentUserId: post.commentUserId[index],
-            commentUserNames: post.commentUserNames[index],
-            commentDates: post.commentDates[index],
-            commentDescriptions: post.commentDescriptions[index]
-            // index: [index]
+            index: [index]
           }, {
             headers: { Authorization: 'Bearer ' + tokenWithDatas.token }
           })
           .then((response) => {
-            window.alert('Votre commentaire a été supprimé')
-            // window.location.reload()
+            this.getAllPosts()
           })
           .catch((error) => {
             console.log(error.response.data)

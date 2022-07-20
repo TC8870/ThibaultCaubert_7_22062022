@@ -246,31 +246,38 @@ exports.createComment = (req, res, next) => {
 };
 
 //Supprimer un commentaire ***********************************************************************************************************
+// Obligatoirede faire en 2 étapes car Mongo ne permet pas une suppression par index, 
+// Au lieu de celà on modifie les champs que l'on supprime par la suite
+// Step 1 - Passage des champs (tous requis) à une valeur "null"
 exports.deleteComment = (req, res, next) => {
-  // Numéro d'index
-  const myIndexToDelete = req.body.index
-  const MyArray = 
-  console.log(myIndexToDelete)
-
-  console.log(req.body),
-  console.log(req.params)
-
-  // En cours d'ajustement
-  Post.updateOne(
+  // Numéro d'index à supprimer
+  const myIndexToDelete = JSON.parse(req.body.index)
+    Post.updateOne(
     { _id: req.params.id },
     {
-      $update: {
-        commentUniqueId : '1',
-        commentUserId : req.body.commentUserId,
-        commentUserNames: req.body.commentUserNames,
-        commentDates: req.body.commentDates,
-        commentDescriptions: req.body.commentDescriptions,
+      $unset: {
+        ["commentUniqueId." + myIndexToDelete] : 1,
+        ["commentUserId." + myIndexToDelete] : 1,
+        ["commentUserNames." + myIndexToDelete] : 1,
+        ["commentDates." + myIndexToDelete] : 1,
+        ["commentDescriptions." + myIndexToDelete] : 1,
       },
-    }
+    })
+    .then(() =>     
+    // Step 2 - Suppression des champs avec une valeur "null"
+    Post.updateOne(
+      { _id: req.params.id },
+      {
+        $pull: {
+          commentUniqueId : null,
+          commentUserId : null,
+          commentUserNames: null,
+          commentDates : null,
+          commentDescriptions : null,
+        },
+      })
+    .then(() => res.status(200).json({ message: "Votre commentaire a été supprimé" }))
+    .catch((error) => res.status(400).json({ error }))
     )
-    .then(() =>
-    console.log(commentUniqueId[req.body]),
-      res.status(200).json({ message: "Votre commentaire a été supprimé" })
-    )
-    .catch((error) => res.status(400).json({ error }));
+    .catch((error) => res.status(400).json({ error }))
 }
